@@ -172,6 +172,18 @@ th { color: var(--muted); font-weight: 600; font-size: 0.75rem; letter-spacing: 
         <dt>Estado</dt><dd>Sin intentos todavía</dd>
       </dl>
 
+      <h2>Diagnóstico del micrófono</h2>
+      <div class="row" style="align-items:center">
+        <label for="lang" style="color:var(--muted)">Idioma</label>
+        <select id="lang" style="flex:1 1 140px;min-width:0;font:inherit;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink)">
+          <option value="es-AR">Español (Argentina)</option>
+          <option value="es-419">Español (Latinoamérica)</option>
+          <option value="es-ES">Español (España)</option>
+          <option value="es-US">Español (EE. UU.)</option>
+        </select>
+      </div>
+      <pre id="evlog" style="margin:0;padding:10px 12px;border-radius:12px;background:var(--bg);font-family:var(--font-data);font-size:.8rem;white-space:pre-wrap;overflow-x:auto;min-height:3em">Tocá “¡Decilo vos!” y acá aparece qué hizo el micrófono.</pre>
+
       <h2>Probar sin micrófono</h2>
       <p style="margin:0;color:var(--muted)">Escribí lo que “escuchó” el sistema (por ejemplo: lana, ana, rata) para comprobar cómo evalúa.</p>
       <div class="row">
@@ -330,7 +342,7 @@ function feedbackFor(r) {
   function showResult(r, conf, alts, source) {
     var bubble = $("bubble"), stage = $("stage");
     if (r.none) {
-      bubble.innerHTML = '<span class="msg">' + feedbackFor(r) + "</span>";
+      bubble.innerHTML = '<span class="msg">' + feedbackFor(r) + "</span>" + (r.hint ? '<span style="font-size:.85rem;color:var(--muted)">' + esc(r.hint) + "</span>" : "");
     } else {
       state.xp += r.xp;
       state.stars += r.stars;
@@ -352,6 +364,11 @@ function feedbackFor(r) {
   /* Voz */
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   var rec = null, listening = false, gotResult = false, failed = false, timer = null;
+  var evlog = [], t0 = 0;
+  function logEv(name) {
+    evlog.push(((Date.now() - t0) / 1000).toFixed(1) + " s  " + name);
+    $("evlog").textContent = evlog.join("\n");
+  }
 
   function setListening(on) {
     listening = on;
@@ -363,19 +380,27 @@ function feedbackFor(r) {
     if (!SR) return;
     if (listening) { try { rec.stop(); } catch (e) {} return; }
     gotResult = false; failed = false;
+    var lastInterim = null, lastConf = null, lang = $("lang").value || "es-AR";
+    evlog = []; t0 = Date.now();
     rec = new SR();
-    rec.lang = "es-AR";
-    rec.interimResults = false;
+    rec.lang = lang;
+    rec.interimResults = true;
     rec.continuous = false;
     rec.maxAlternatives = 5;
+    ["audiostart", "soundstart", "speechstart", "speechend", "soundend", "audioend", "nomatch"].forEach(function (n) {
+      rec["on" + n] = function () { logEv(n); };
+    });
     rec.onresult = function (ev) {
-      gotResult = true;
-      var res = ev.results[0], alts = [];
+      var res = ev.results[ev.results.length - 1], alts = [];
       for (var i = 0; i < res.length; i++) alts.push(res[i].transcript.trim());
-      var conf = typeof res[0].confidence === "number" ? res[0].confidence : null;
-      showResult(evaluate(alts[0]), conf, alts, "reconocimiento de voz del navegador (es-AR)");
+      var conf = typeof res[0].confidence === "number" && res[0].confidence > 0 ? res[0].confidence : null;
+      if (!res.isFinal) { lastInterim = alts; lastConf = conf; logEv("parcial: " + alts[0]); return; }
+      gotResult = true;
+      logEv("final: " + alts.join(" | "));
+      showResult(evaluate(alts[0]), conf, alts, "reconocimiento de voz del navegador (" + lang + ")");
     };
     rec.onerror = function (ev) {
+      logEv("error: " + ev.error);
       failed = true;
       var msg = "No pude escuchar. ¿Probamos otra vez?";
       if (ev.error === "not-allowed" || ev.error === "service-not-allowed") msg = "Falta el permiso del micrófono. Habilitalo en el navegador y probá otra vez.";
@@ -386,7 +411,15 @@ function feedbackFor(r) {
     rec.onend = function () {
       clearTimeout(timer);
       setListening(false);
-      if (!gotResult && !failed) showResult({ none: true, heard: "", target: show(g2p(TARGET_WORD)) }, null, [], "");
+      logEv("fin");
+      if (!gotResult && !failed && lastInterim) {
+        gotResult = true;
+        showResult(evaluate(lastInterim[0]), lastConf, lastInterim, "resultado parcial del reconocimiento (" + lang + ")");
+      } else if (!gotResult && !failed) {
+        var heardSound = evlog.some(function (l) { return l.indexOf("soundstart") > -1; });
+        showResult({ none: true, heard: "", target: show(g2p(TARGET_WORD)),
+          hint: heardSound ? "El micrófono detectó sonido, pero no entendió palabras." : "El micrófono no detectó sonido. Revisá el permiso y el volumen de entrada." }, null, [], "");
+      }
     };
     try {
       rec.start();
