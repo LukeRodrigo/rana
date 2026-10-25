@@ -1,119 +1,349 @@
+
 <!doctype html>
 <html lang="es">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Prueba RANA</title>
+<title>Rana aprende a hablar</title>
+
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@400;600;700&display=swap">
+
 <style>
-/* Concepto: una sola pantalla de juego (rana + palabra + micrófono) y, debajo, un panel plegable con los datos técnicos del intento. */
 :root {
-  --bg: #E6F2EF;
-  --surface: #FFFFFF;
-  --ink: #12332E;
-  --muted: #4C6B66;
-  --line: #C9DDD8;
-  --frog: #3FA45B;
-  --frog-deep: #25703F;
-  --pond: #BFE3DD;
-  --sun: #F2B01E;
-  --ok: #1B7F47;
-  --warn: #9A5B00;
-  --focus: #0B5FD7;
-  --font-display: "Baloo 2", "Trebuchet MS", system-ui, sans-serif;
-  --font-body: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-data: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  color-scheme: light;
+  --bg:#E6F2EF;
+  --surface:#FFFFFF;
+  --ink:#12332E;
+  --muted:#4C6B66;
+  --line:#C9DDD8;
+  --frog:#3FA45B;
+  --frog-deep:#25703F;
+  --pond:#BFE3DD;
+  --sun:#F2B01E;
+  --ok:#1B7F47;
+  --warn:#9A5B00;
+  --focus:#0B5FD7;
+  --font-display:"Baloo 2","Trebuchet MS",system-ui,sans-serif;
+  --font-body:"Nunito",system-ui,sans-serif;
+  --font-data:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  color-scheme:light;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0E2421;
-    --surface: #153430;
-    --ink: #E6F4F1;
-    --muted: #9CBDB6;
-    --line: #28514B;
-    --frog: #55C173;
-    --frog-deep: #2F8F52;
-    --pond: #1F4A44;
-    --sun: #FFC94D;
-    --ok: #6FD39A;
-    --warn: #F0B35A;
-    --focus: #7DB4FF;
-    color-scheme: dark;
+
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#0E2421;
+    --surface:#153430;
+    --ink:#E6F4F1;
+    --muted:#9CBDB6;
+    --line:#28514B;
+    --frog:#55C173;
+    --frog-deep:#2F8F52;
+    --pond:#1F4A44;
+    --sun:#FFC94D;
+    --ok:#6FD39A;
+    --warn:#F0B35A;
+    --focus:#7DB4FF;
+    color-scheme:dark;
   }
 }
-* { box-sizing: border-box; }
-html, body { margin: 0; }
-body {
-  background: var(--bg);
-  color: var(--ink);
-  font-family: var(--font-body);
-  font-size: 17px;
-  line-height: 1.5;
-  padding-block: 20px 40px;
-  padding-left: max(16px, env(safe-area-inset-left, 0px));
-  padding-right: max(16px, env(safe-area-inset-right, 0px));
+
+*{box-sizing:border-box}
+html,body{margin:0}
+
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-size:17px;
+  line-height:1.5;
+  padding:20px 16px 40px;
 }
-main { max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
-h1, h2 { font-family: var(--font-display); margin: 0; text-wrap: balance; }
-button { font: inherit; color: inherit; }
-:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 
-.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-.stat { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 8px 6px; text-align: center; min-width: 0; }
-.stat b { display: block; font-family: var(--font-display); font-size: 1.35rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
-.stat span { font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+main{
+  max-width:560px;
+  margin:0 auto;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
 
-.stage { background: var(--surface); border: 1px solid var(--line); border-radius: 28px; padding: 20px 16px 24px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
-.pond { width: min(280px, 80%); }
-.pond svg { width: 100%; height: auto; display: block; overflow: visible; }
-.frog-body { transition: transform .2s; transform-origin: 50% 90%; }
-.is-hop .frog-body { animation: hop .7s ease-out; }
-@keyframes hop { 0%{transform:translateY(0)} 35%{transform:translateY(-26px)} 70%{transform:translateY(0)} 85%{transform:translateY(-8px)} 100%{transform:translateY(0)} }
-#mouthOpen { display: none; }
-.is-listening #mouthOpen { display: block; }
-.is-listening #mouthSmile { display: none; }
+h1,h2{font-family:var(--font-display);margin:0}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
 
-.word { font-family: var(--font-display); font-weight: 800; font-size: clamp(2.6rem, 14vw, 4rem); letter-spacing: 0.12em; line-height: 1; margin: 4px 0 0; }
-.syll { color: var(--muted); font-size: 1rem; letter-spacing: 0.3em; margin-top: -6px; }
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+}
 
-.actions { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 360px; }
-.btn { border: 0; border-radius: 18px; min-height: 58px; padding: 10px 18px; font-weight: 700; font-size: 1.1rem; cursor: pointer; }
-.btn-main { background: var(--frog); color: #fff; font-family: var(--font-display); font-size: 1.35rem; box-shadow: 0 4px 0 var(--frog-deep); }
-.btn-main:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--frog-deep); }
-.btn-main[disabled] { opacity: .55; cursor: not-allowed; }
-.is-listening .btn-main { background: var(--sun); color: #3A2A00; box-shadow: 0 4px 0 #B07F10; }
-.btn-soft { background: var(--pond); color: var(--ink); }
+.stat{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:8px 6px;
+  text-align:center;
+  min-width:0;
+}
 
-.bubble { width: 100%; max-width: 420px; text-align: center; border-radius: 18px; padding: 12px 14px; background: var(--bg); min-height: 3.4em; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 2px; }
-.bubble .msg { font-family: var(--font-display); font-weight: 600; font-size: 1.3rem; line-height: 1.25; }
-.bubble .pts { color: var(--ok); font-weight: 700; font-variant-numeric: tabular-nums; }
-.stars { font-size: 1.9rem; letter-spacing: 0.15em; line-height: 1; }
-.stars .on { color: var(--sun); }
-.stars .off { color: var(--line); }
+.stat b{
+  display:block;
+  font-family:var(--font-display);
+  font-size:1.35rem;
+  line-height:1.1;
+}
 
-details { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 4px 16px; }
-summary { cursor: pointer; font-weight: 700; padding: 12px 0; list-style-position: inside; }
-.panel { padding-bottom: 16px; display: flex; flex-direction: column; gap: 14px; font-size: 0.95rem; }
-.panel h2 { font-size: 1.1rem; }
-.kv { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; margin: 0; }
-.kv dt { color: var(--muted); }
-.kv dd { margin: 0; font-family: var(--font-data); font-size: 0.88rem; overflow-wrap: anywhere; }
-.scroll { overflow-x: auto; }
-table { border-collapse: collapse; width: 100%; font-size: 0.85rem; font-variant-numeric: tabular-nums; }
-th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
-th { color: var(--muted); font-weight: 600; font-size: 0.75rem; letter-spacing: 0.05em; text-transform: uppercase; }
-.note { background: var(--bg); border-radius: 12px; padding: 10px 12px; color: var(--muted); font-size: 0.88rem; }
-.row { display: flex; flex-wrap: wrap; gap: 8px; }
-.row input { flex: 1 1 140px; min-width: 0; font: inherit; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
-.btn-sm { min-height: 44px; border-radius: 12px; font-size: 0.95rem; background: var(--pond); border: 0; padding: 8px 14px; font-weight: 700; cursor: pointer; }
-.bad { color: var(--warn); }
-@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+.stat span{
+  font-size:.72rem;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+
+.stage{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:28px;
+  padding:20px 16px 24px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:12px;
+}
+
+.pond{width:min(280px,80%)}
+.pond svg{width:100%;height:auto;display:block;overflow:visible}
+
+.frog-body{
+  transition:transform .2s;
+  transform-origin:50% 90%;
+}
+
+.is-hop .frog-body{animation:hop .7s ease-out}
+
+@keyframes hop{
+  0%{transform:translateY(0)}
+  35%{transform:translateY(-26px)}
+  70%{transform:translateY(0)}
+  85%{transform:translateY(-8px)}
+  100%{transform:translateY(0)}
+}
+
+#mouthOpen{display:none}
+.is-listening #mouthOpen{display:block}
+.is-listening #mouthSmile{display:none}
+
+.word-controls{
+  width:100%;
+  max-width:360px;
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+}
+
+.word-controls label{
+  color:var(--muted);
+  font-weight:700;
+  font-size:.9rem;
+}
+
+.word-controls select{
+  width:100%;
+  min-height:48px;
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background:var(--bg);
+  color:var(--ink);
+}
+
+.word{
+  font-family:var(--font-display);
+  font-weight:800;
+  font-size:clamp(2.6rem,14vw,4rem);
+  letter-spacing:.12em;
+  line-height:1;
+  margin:4px 0 0;
+  text-align:center;
+  overflow-wrap:anywhere;
+}
+
+.syll{
+  color:var(--muted);
+  font-size:1rem;
+  letter-spacing:.2em;
+  margin-top:-6px;
+}
+
+.actions{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  width:100%;
+  max-width:360px;
+}
+
+.btn{
+  border:0;
+  border-radius:18px;
+  min-height:58px;
+  padding:10px 18px;
+  font-weight:700;
+  font-size:1.1rem;
+  cursor:pointer;
+}
+
+.btn-main{
+  background:var(--frog);
+  color:#fff;
+  font-family:var(--font-display);
+  font-size:1.35rem;
+  box-shadow:0 4px 0 var(--frog-deep);
+}
+
+.btn-main:active{
+  transform:translateY(2px);
+  box-shadow:0 2px 0 var(--frog-deep);
+}
+
+.btn-main:disabled{opacity:.55;cursor:not-allowed}
+
+.is-listening .btn-main{
+  background:var(--sun);
+  color:#3A2A00;
+  box-shadow:0 4px 0 #B07F10;
+}
+
+.btn-soft{background:var(--pond);color:var(--ink)}
+
+.bubble{
+  width:100%;
+  max-width:420px;
+  text-align:center;
+  border-radius:18px;
+  padding:12px 14px;
+  background:var(--bg);
+  min-height:3.4em;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  gap:2px;
+}
+
+.bubble .msg{
+  font-family:var(--font-display);
+  font-weight:600;
+  font-size:1.3rem;
+  line-height:1.25;
+}
+
+.bubble .pts{
+  color:var(--ok);
+  font-weight:700;
+}
+
+.stars{font-size:1.9rem;letter-spacing:.15em;line-height:1}
+.stars .on{color:var(--sun)}
+.stars .off{color:var(--line)}
+
+details{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:4px 16px;
+}
+
+summary{cursor:pointer;font-weight:700;padding:12px 0}
+
+.panel{
+  padding-bottom:16px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  font-size:.95rem;
+}
+
+.panel h2{font-size:1.1rem}
+
+.kv{
+  display:grid;
+  grid-template-columns:max-content 1fr;
+  gap:4px 14px;
+  margin:0;
+}
+
+.kv dt{color:var(--muted)}
+.kv dd{
+  margin:0;
+  font-family:var(--font-data);
+  font-size:.88rem;
+  overflow-wrap:anywhere;
+}
+
+.scroll{overflow-x:auto}
+
+table{
+  border-collapse:collapse;
+  width:100%;
+  font-size:.85rem;
+  font-variant-numeric:tabular-nums;
+}
+
+th,td{
+  text-align:left;
+  padding:6px 8px;
+  border-bottom:1px solid var(--line);
+  white-space:nowrap;
+}
+
+th{
+  color:var(--muted);
+  font-weight:600;
+  font-size:.75rem;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+}
+
+.note{
+  background:var(--bg);
+  border-radius:12px;
+  padding:10px 12px;
+  color:var(--muted);
+  font-size:.88rem;
+}
+
+.row{display:flex;flex-wrap:wrap;gap:8px}
+
+.row input,.row select{
+  flex:1 1 140px;
+  min-width:0;
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background:var(--bg);
+  color:var(--ink);
+}
+
+.btn-sm{
+  min-height:44px;
+  border-radius:12px;
+  font-size:.95rem;
+  background:var(--pond);
+  border:0;
+  padding:8px 14px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
 </style>
 </head>
+
 <body>
 <main>
-  <h1 class="sr" style="position:absolute;left:-9999px">Prueba RANA</h1>
+  <h1 style="position:absolute;left:-9999px">Rana aprende a hablar</h1>
 
   <div class="stats" aria-label="Progreso">
     <div class="stat"><b id="sLevel">1</b><span>Nivel</span></div>
@@ -147,8 +377,20 @@ th { color: var(--muted); font-weight: 600; font-size: 0.75rem; letter-spacing: 
       </svg>
     </div>
 
-    <p class="word" aria-label="Palabra: rana">RANA</p>
-    <p class="syll" aria-hidden="true">RA · NA</p>
+    <div class="word-controls">
+      <label for="soundGroup">¿Qué sonido vamos a practicar?</label>
+      <select id="soundGroup">
+        <option value="R">R fuerte</option>
+        <option value="GR">GR</option>
+        <option value="C">C con A, O, U</option>
+      </select>
+
+      <label for="wordSelect">Elegí una palabra</label>
+      <select id="wordSelect"></select>
+    </div>
+
+    <p class="word" id="targetWord" aria-label="Palabra para practicar">RANA</p>
+    <p class="syll" id="targetSyll" aria-hidden="true">RA · NA</p>
 
     <div class="actions">
       <button class="btn btn-soft" id="btnListen" type="button">Escuchar la palabra</button>
@@ -156,7 +398,7 @@ th { color: var(--muted); font-weight: 600; font-size: 0.75rem; letter-spacing: 
     </div>
 
     <div class="bubble" id="bubble" role="status" aria-live="polite">
-      <span class="msg">Tocá el botón verde y decí “rana”.</span>
+      <span class="msg">Elegí una palabra y decila en voz alta.</span>
     </div>
   </section>
 
@@ -164,7 +406,10 @@ th { color: var(--muted); font-weight: 600; font-size: 0.75rem; letter-spacing: 
     <summary>Panel técnico del intento</summary>
     <div class="panel">
       <div class="note">
-        Prototipo de validación. No es una herramienta clínica ni reemplaza a un profesional. El reconocimiento de voz del navegador convierte el audio en texto, así que detecta bien palabras distintas (rana / lana) pero no distorsiones finas del sonido. En Chrome, el audio lo procesa el servicio de voz del navegador: probalo solo con consentimiento de los padres.
+        Prototipo experimental. No es una herramienta clínica ni reemplaza a un profesional.
+        El navegador convierte la voz en texto. Puede reconocer una palabra como correcta
+        aunque la pronunciación de un sonido no lo sea. En Chrome, el reconocimiento puede
+        procesarse mediante un servicio en línea. Usalo solo con el consentimiento de los padres.
       </div>
 
       <h2>Último intento</h2>
@@ -175,29 +420,43 @@ th { color: var(--muted); font-weight: 600; font-size: 0.75rem; letter-spacing: 
       <h2>Diagnóstico del micrófono</h2>
       <div class="row" style="align-items:center">
         <label for="lang" style="color:var(--muted)">Idioma</label>
-        <select id="lang" style="flex:1 1 140px;min-width:0;font:inherit;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink)">
+        <select id="lang">
           <option value="es-AR">Español (Argentina)</option>
           <option value="es-419">Español (Latinoamérica)</option>
           <option value="es-ES">Español (España)</option>
           <option value="es-US">Español (EE. UU.)</option>
         </select>
       </div>
-      <pre id="evlog" style="margin:0;padding:10px 12px;border-radius:12px;background:var(--bg);font-family:var(--font-data);font-size:.8rem;white-space:pre-wrap;overflow-x:auto;min-height:3em">Tocá “¡Decilo vos!” y acá aparece qué hizo el micrófono.</pre>
+
+      <pre id="evlog" style="margin:0;padding:10px 12px;border-radius:12px;background:var(--bg);font-family:var(--font-data);font-size:.8rem;white-space:pre-wrap;overflow-x:auto;min-height:3em">Tocá “¡Decilo vos!” para probar el micrófono.</pre>
 
       <h2>Probar sin micrófono</h2>
-      <p style="margin:0;color:var(--muted)">Escribí lo que “escuchó” el sistema (por ejemplo: lana, ana, rata) para comprobar cómo evalúa.</p>
+      <p style="margin:0;color:var(--muted)">
+        Escribí lo que querés simular que escuchó el sistema. Por ejemplo, para RANA:
+        lana, ana o rana. La comparación se hará con la palabra seleccionada.
+      </p>
       <div class="row">
-        <input id="manual" type="text" placeholder="lana" autocomplete="off" aria-label="Texto reconocido">
+        <input id="manual" type="text" placeholder="Escribí la palabra reconocida" autocomplete="off" aria-label="Texto reconocido">
         <button class="btn-sm" id="btnManual" type="button">Evaluar texto</button>
       </div>
 
       <h2>Historial</h2>
       <div class="scroll">
         <table>
-          <thead><tr><th>Hora</th><th>Reconocido</th><th>Confianza</th><th>Diferencia</th><th>Estrellas</th></tr></thead>
+          <thead>
+            <tr>
+              <th>Hora</th>
+              <th>Objetivo</th>
+              <th>Reconocido</th>
+              <th>Confianza</th>
+              <th>Diferencia</th>
+              <th>Estrellas</th>
+            </tr>
+          </thead>
           <tbody id="hist"></tbody>
         </table>
       </div>
+
       <div class="row">
         <button class="btn-sm" id="btnCsv" type="button">Exportar CSV</button>
         <button class="btn-sm" id="btnClear" type="button">Borrar historial</button>
@@ -207,20 +466,76 @@ th { color: var(--muted); font-weight: 600; font-size: 0.75rem; letter-spacing: 
 </main>
 
 <script>
-// LOGIC-START
+"use strict";
+
+// ============================================================
+// CONFIGURACIÓN DE PALABRAS
+// ============================================================
+
 var TARGET_WORD = "rana";
+
+var WORD_GROUPS = {
+  R: ["rana", "ratón", "remo", "rueda"],
+  GR: ["grano", "grande", "grillo", "grupo"],
+  C: ["casa", "cama", "copa", "cuna"]
+};
+
+var SYLLABLES = {
+  rana: "RA · NA",
+  ratón: "RA · TÓN",
+  remo: "RE · MO",
+  rueda: "RUE · DA",
+  grano: "GRA · NO",
+  grande: "GRAN · DE",
+  grillo: "GRI · LLO",
+  grupo: "GRU · PO",
+  casa: "CA · SA",
+  cama: "CA · MA",
+  copa: "CO · PA",
+  cuna: "CU · NA"
+};
+
 var DISP = { C: "ch", Y: "ll", "#": "ñ" };
 
+// ============================================================
+// CONVERSIÓN APROXIMADA A FONEMAS
+// Es una representación simplificada, no un análisis fonético clínico.
+// ============================================================
+
 function g2p(word) {
-  var s = String(word).toLowerCase().replace(/ñ/g, "#").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z#]/g, "");
-  s = s.replace(/ch/g, "C").replace(/ll/g, "Y").replace(/rr/g, "r").replace(/qu/g, "k")
-       .replace(/gu([ei])/g, "G$1").replace(/g([ei])/g, "x$1").replace(/G/g, "g")
-       .replace(/c([ei])/g, "s$1").replace(/c/g, "k").replace(/z/g, "s")
-       .replace(/h/g, "").replace(/v/g, "b").replace(/j/g, "x").replace(/y/g, "Y")
-       .replace(/w/g, "u").replace(/q/g, "k");
+  var s = String(word)
+    .toLowerCase()
+    .replace(/ñ/g, "#")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z#]/g, "");
+
+  s = s
+    .replace(/ch/g, "C")
+    .replace(/ll/g, "Y")
+    .replace(/rr/g, "r")
+    .replace(/qu/g, "k")
+    .replace(/gu([ei])/g, "G$1")
+    .replace(/g([ei])/g, "x$1")
+    .replace(/G/g, "g")
+    .replace(/c([ei])/g, "s$1")
+    .replace(/c/g, "k")
+    .replace(/z/g, "s")
+    .replace(/h/g, "")
+    .replace(/v/g, "b")
+    .replace(/j/g, "x")
+    .replace(/y/g, "Y")
+    .replace(/w/g, "u")
+    .replace(/q/g, "k");
+
   return s.split("");
 }
-function show(ph) { return ph.map(function (p) { return DISP[p] || p; }); }
+
+function show(ph) {
+  return ph.map(function(p) {
+    return DISP[p] || p;
+  });
+}
 
 function posLabel(i, n) {
   if (n === 1) return "único";
@@ -230,77 +545,223 @@ function posLabel(i, n) {
 }
 
 function align(target, produced) {
-  var n = target.length, m = produced.length, i, j;
+  var n = target.length;
+  var m = produced.length;
+  var i, j;
   var dp = [];
-  for (i = 0; i <= n; i++) { dp[i] = []; for (j = 0; j <= m; j++) dp[i][j] = 0; }
+
+  for (i = 0; i <= n; i++) {
+    dp[i] = [];
+    for (j = 0; j <= m; j++) dp[i][j] = 0;
+  }
+
   for (i = 0; i <= n; i++) dp[i][0] = i;
   for (j = 0; j <= m; j++) dp[0][j] = j;
-  for (i = 1; i <= n; i++) for (j = 1; j <= m; j++) {
-    var c = target[i - 1] === produced[j - 1] ? 0 : 1;
-    dp[i][j] = Math.min(dp[i - 1][j - 1] + c, dp[i - 1][j] + 1, dp[i][j - 1] + 1);
+
+  for (i = 1; i <= n; i++) {
+    for (j = 1; j <= m; j++) {
+      var cost = target[i - 1] === produced[j - 1] ? 0 : 1;
+      dp[i][j] = Math.min(
+        dp[i - 1][j - 1] + cost,
+        dp[i - 1][j] + 1,
+        dp[i][j - 1] + 1
+      );
+    }
   }
+
   var ops = [];
-  i = n; j = m;
+  i = n;
+  j = m;
+
   while (i > 0 || j > 0) {
-    if (i > 0 && j > 0 && dp[i][j] === dp[i - 1][j - 1] + (target[i - 1] === produced[j - 1] ? 0 : 1)) {
-      if (target[i - 1] !== produced[j - 1]) ops.push({ type: "sustitución", target: target[i - 1], produced: produced[j - 1], pos: posLabel(i - 1, n) });
-      i--; j--;
+    if (
+      i > 0 && j > 0 &&
+      dp[i][j] === dp[i - 1][j - 1] +
+      (target[i - 1] === produced[j - 1] ? 0 : 1)
+    ) {
+      if (target[i - 1] !== produced[j - 1]) {
+        ops.push({
+          type: "sustitución",
+          target: target[i - 1],
+          produced: produced[j - 1],
+          pos: posLabel(i - 1, n)
+        });
+      }
+      i--;
+      j--;
     } else if (i > 0 && dp[i][j] === dp[i - 1][j] + 1) {
-      ops.push({ type: "omisión", target: target[i - 1], produced: "", pos: posLabel(i - 1, n) });
+      ops.push({
+        type: "omisión",
+        target: target[i - 1],
+        produced: "",
+        pos: posLabel(i - 1, n)
+      });
       i--;
     } else {
-      ops.push({ type: "agregado", target: "", produced: produced[j - 1], pos: i === 0 ? "inicial" : (i === n ? "final" : "medial") });
+      ops.push({
+        type: "agregado",
+        target: "",
+        produced: produced[j - 1],
+        pos: i === 0 ? "inicial" : (i === n ? "final" : "medial")
+      });
       j--;
     }
   }
+
   ops.reverse();
   return { dist: dp[n][m], ops: ops };
 }
 
 function describeOps(ops) {
   if (!ops.length) return "sin diferencias";
-  return ops.map(function (o) {
-    var t = DISP[o.target] || o.target, p = DISP[o.produced] || o.produced;
-    if (o.type === "sustitución") return "sustitución " + t + " → " + p + " (" + o.pos + ")";
-    if (o.type === "omisión") return "omisión de " + t + " (" + o.pos + ")";
+
+  return ops.map(function(o) {
+    var t = DISP[o.target] || o.target;
+    var p = DISP[o.produced] || o.produced;
+
+    if (o.type === "sustitución") {
+      return "sustitución " + t + " → " + p + " (" + o.pos + ")";
+    }
+    if (o.type === "omisión") {
+      return "omisión de " + t + " (" + o.pos + ")";
+    }
     return "agregado de " + p + " (" + o.pos + ")";
   }).join("; ");
 }
 
-// Evalúa el texto reconocido contra la palabra objetivo. Si hay varias palabras, usa la más cercana.
+// Compara el texto reconocido con la palabra actualmente seleccionada.
 function evaluate(heard) {
-  var words = String(heard || "").split(/\s+/).filter(function (w) { return g2p(w).length > 0; });
-  if (!words.length) return { heard: "", none: true };
-  var target = g2p(TARGET_WORD), best = null;
-  words.forEach(function (w) {
+  var words = String(heard || "")
+    .split(/\s+/)
+    .filter(function(w) {
+      return g2p(w).length > 0;
+    });
+
+  var target = g2p(TARGET_WORD);
+
+  if (!words.length) {
+    return {
+      heard: "",
+      none: true,
+      target: show(target)
+    };
+  }
+
+  var best = null;
+
+  words.forEach(function(w) {
     var a = align(target, g2p(w));
-    if (!best || a.dist < best.dist) best = { word: w, dist: a.dist, ops: a.ops };
+    if (!best || a.dist < best.dist) {
+      best = {
+        word: w,
+        dist: a.dist,
+        ops: a.ops
+      };
+    }
   });
+
   var stars = best.dist === 0 ? 3 : (best.dist === 1 ? 2 : 1);
+
   return {
-    heard: best.word, none: false, dist: best.dist, ops: best.ops, stars: stars,
-    produced: show(g2p(best.word)), target: show(target),
+    heard: best.word,
+    none: false,
+    dist: best.dist,
+    ops: best.ops,
+    stars: stars,
+    produced: show(g2p(best.word)),
+    target: show(target),
     xp: stars === 3 ? 30 : (stars === 2 ? 15 : 5)
   };
 }
 
 function feedbackFor(r) {
   if (r.none) return "No te escuché bien. ¿Probamos otra vez?";
-  if (r.stars === 3) return "¡Excelente! ¡Dijiste RANA!";
+  if (r.stars === 3) return "¡Excelente! ¡Dijiste " + TARGET_WORD.toUpperCase() + "!";
   if (r.stars === 2) return "¡Casi! Escuchemos nuevamente.";
   return "¡Muy bien el esfuerzo! Probemos una vez más.";
 }
-// LOGIC-END
 
-(function () {
-  var STORE = "rana-prueba-v1";
-  var $ = function (id) { return document.getElementById(id); };
-  var state = { xp: 0, stars: 0, streak: 0, hist: [] };
+// ============================================================
+// INTERFAZ Y ESTADO
+// ============================================================
+
+(function() {
+  var STORE = "rana-prueba-v2";
+  var $ = function(id) {
+    return document.getElementById(id);
+  };
+
+  var state = {
+    xp: 0,
+    stars: 0,
+    streak: 0,
+    hist: []
+  };
+
+  function esc(t) {
+    return String(t).replace(/[&<>"]/g, function(c) {
+      return {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;"
+      }[c];
+    });
+  }
 
   function load() {
-    try { var s = JSON.parse(localStorage.getItem(STORE)); if (s && typeof s.xp === "number") state = s; } catch (e) {}
+    try {
+      var s = JSON.parse(localStorage.getItem(STORE));
+      if (
+        s &&
+        typeof s.xp === "number" &&
+        Array.isArray(s.hist)
+      ) {
+        state = s;
+      }
+    } catch(e) {}
   }
-  function save() { try { localStorage.setItem(STORE, JSON.stringify(state)); } catch (e) {} }
+
+  function save() {
+    try {
+      localStorage.setItem(STORE, JSON.stringify(state));
+    } catch(e) {}
+  }
+
+  function setTargetWord(word) {
+    TARGET_WORD = word.toLowerCase();
+
+    $("targetWord").textContent = TARGET_WORD.toUpperCase();
+    $("targetWord").setAttribute("aria-label", "Palabra: " + TARGET_WORD);
+    $("targetSyll").textContent = SYLLABLES[TARGET_WORD] || "";
+
+    $("btnListen").textContent = "Escuchar: " + TARGET_WORD.toUpperCase();
+    $("bubble").innerHTML =
+      '<span class="msg">Escuchá la palabra y después decila vos.</span>';
+  }
+
+  function updateWordOptions() {
+    var group = $("soundGroup").value;
+    var select = $("wordSelect");
+    var words = WORD_GROUPS[group];
+
+    select.innerHTML = words.map(function(word) {
+      return '<option value="' + esc(word) + '">' +
+        esc(word.toUpperCase()) + '</option>';
+    }).join("");
+
+    var preferred = group === "R" ? "rana" :
+                    group === "GR" ? "grano" : "casa";
+
+    select.value = preferred;
+    setTargetWord(select.value);
+  }
+
+  $("soundGroup").addEventListener("change", updateWordOptions);
+
+  $("wordSelect").addEventListener("change", function() {
+    setTargetWord(this.value);
+  });
 
   function renderStats() {
     $("sXp").textContent = state.xp;
@@ -311,60 +772,127 @@ function feedbackFor(r) {
 
   function starsHtml(n) {
     var h = "";
-    for (var i = 0; i < 3; i++) h += '<span class="' + (i < n ? "on" : "off") + '">★</span>';
+    for (var i = 0; i < 3; i++) {
+      h += '<span class="' + (i < n ? "on" : "off") + '">★</span>';
+    }
     return h;
   }
 
-  function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
-
   function renderHist() {
-    var rows = state.hist.slice(-10).reverse().map(function (h) {
+    var rows = state.hist.slice(-10).reverse().map(function(h) {
       var conf = h.conf == null ? "—" : Math.round(h.conf * 100) + "%";
-      return "<tr><td>" + esc(h.time) + "</td><td>" + esc(h.heard || "(nada)") + "</td><td>" + conf + "</td><td>" + esc(h.diff) + "</td><td>" + h.stars + "</td></tr>";
+
+      return "<tr><td>" + esc(h.time) +
+        "</td><td>" + esc(h.target || "—") +
+        "</td><td>" + esc(h.heard || "(nada)") +
+        "</td><td>" + conf +
+        "</td><td>" + esc(h.diff) +
+        "</td><td>" + h.stars + "</td></tr>";
     }).join("");
-    $("hist").innerHTML = rows || '<tr><td colspan="5">Sin intentos todavía</td></tr>';
+
+    $("hist").innerHTML = rows ||
+      '<tr><td colspan="6">Sin intentos todavía</td></tr>';
   }
 
   function renderLast(r, conf, alts, source) {
-    var rows = [["Palabra objetivo", "RANA · fonemas " + r.target.join(" ")]];
+    var rows = [[
+      "Palabra objetivo",
+      TARGET_WORD.toUpperCase() + " · fonemas " + show(g2p(TARGET_WORD)).join(" ")
+    ]];
+
     if (r.none) {
-      rows.push(["Resultado", "No se reconoció voz"]);
+      rows.push(["Resultado", "No se reconoció una palabra"]);
+      if (r.hint) rows.push(["Detalle", r.hint]);
     } else {
-      rows.push(["Reconocido", r.heard + " · fonemas " + r.produced.join(" ")]);
+      rows.push([
+        "Reconocido",
+        r.heard + " · fonemas " + r.produced.join(" ")
+      ]);
       rows.push(["Diferencias", describeOps(r.ops)]);
-      rows.push(["Confianza", conf == null ? "no disponible (texto manual)" : Math.round(conf * 100) + "%"]);
-      if (alts && alts.length > 1) rows.push(["Alternativas", alts.slice(1).join(", ")]);
+      rows.push([
+        "Confianza",
+        conf == null ? "no disponible (texto manual)" : Math.round(conf * 100) + "%"
+      ]);
+      if (alts && alts.length > 1) {
+        rows.push(["Alternativas", alts.slice(1).join(", ")]);
+      }
       rows.push(["Origen", source]);
     }
-    $("lastKv").innerHTML = rows.map(function (x) { return "<dt>" + esc(x[0]) + "</dt><dd>" + esc(x[1]) + "</dd>"; }).join("");
+
+    $("lastKv").innerHTML = rows.map(function(x) {
+      return "<dt>" + esc(x[0]) + "</dt><dd>" + esc(x[1]) + "</dd>";
+    }).join("");
   }
 
   function showResult(r, conf, alts, source) {
-    var bubble = $("bubble"), stage = $("stage");
+    var bubble = $("bubble");
+    var stage = $("stage");
+
     if (r.none) {
-      bubble.innerHTML = '<span class="msg">' + feedbackFor(r) + "</span>" + (r.hint ? '<span style="font-size:.85rem;color:var(--muted)">' + esc(r.hint) + "</span>" : "");
+      bubble.innerHTML =
+        '<span class="msg">' + esc(feedbackFor(r)) + "</span>" +
+        (r.hint
+          ? '<span style="font-size:.85rem;color:var(--muted)">' +
+            esc(r.hint) + "</span>"
+          : "");
     } else {
       state.xp += r.xp;
       state.stars += r.stars;
       state.streak = r.stars >= 2 ? state.streak + 1 : 0;
+
       state.hist.push({
-        time: new Date().toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", second: "2-digit" }),
-        heard: r.heard, conf: conf, diff: describeOps(r.ops), stars: r.stars, source: source
+        time: new Date().toLocaleTimeString("es-AR", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit"
+        }),
+        target: TARGET_WORD,
+        group: $("soundGroup").value,
+        heard: r.heard,
+        conf: conf,
+        diff: describeOps(r.ops),
+        stars: r.stars,
+        source: source
       });
-      if (state.hist.length > 200) state.hist = state.hist.slice(-200);
+
+      if (state.hist.length > 200) {
+        state.hist = state.hist.slice(-200);
+      }
+
       save();
-      bubble.innerHTML = '<div class="stars" aria-label="' + r.stars + ' estrellas">' + starsHtml(r.stars) + '</div><span class="msg">' + feedbackFor(r) + '</span><span class="pts">+' + r.xp + " XP</span>";
-      if (r.stars === 3) { stage.classList.remove("is-hop"); void stage.offsetWidth; stage.classList.add("is-hop"); }
+
+      bubble.innerHTML =
+        '<div class="stars" aria-label="' + r.stars + ' estrellas">' +
+        starsHtml(r.stars) + '</div>' +
+        '<span class="msg">' + esc(feedbackFor(r)) + '</span>' +
+        '<span class="pts">+' + r.xp + " XP</span>";
+
+      if (r.stars === 3) {
+        stage.classList.remove("is-hop");
+        void stage.offsetWidth;
+        stage.classList.add("is-hop");
+      }
+
       renderStats();
       renderHist();
     }
+
     renderLast(r, conf, alts, source);
   }
 
-  /* Voz */
+  // ==========================================================
+  // RECONOCIMIENTO DE VOZ
+  // ==========================================================
+
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  var rec = null, listening = false, gotResult = false, failed = false, timer = null;
-  var evlog = [], t0 = 0;
+  var rec = null;
+  var listening = false;
+  var gotResult = false;
+  var failed = false;
+  var timer = null;
+  var evlog = [];
+  var t0 = 0;
+
   function logEv(name) {
     evlog.push(((Date.now() - t0) / 1000).toFixed(1) + " s  " + name);
     $("evlog").textContent = evlog.join("\n");
@@ -378,112 +906,266 @@ function feedbackFor(r) {
 
   function startMic() {
     if (!SR) return;
-    if (listening) { try { rec.stop(); } catch (e) {} return; }
-    gotResult = false; failed = false;
-    var lastInterim = null, lastConf = null, lang = $("lang").value || "es-AR";
-    evlog = []; t0 = Date.now();
+
+    if (listening) {
+      try { rec.stop(); } catch(e) {}
+      return;
+    }
+
+    gotResult = false;
+    failed = false;
+
+    var lastInterim = null;
+    var lastConf = null;
+    var lang = $("lang").value || "es-AR";
+
+    evlog = [];
+    t0 = Date.now();
+
     rec = new SR();
     rec.lang = lang;
     rec.interimResults = true;
     rec.continuous = false;
     rec.maxAlternatives = 5;
-    ["audiostart", "soundstart", "speechstart", "speechend", "soundend", "audioend", "nomatch"].forEach(function (n) {
-      rec["on" + n] = function () { logEv(n); };
+
+    [
+      "audiostart",
+      "soundstart",
+      "speechstart",
+      "speechend",
+      "soundend",
+      "audioend",
+      "nomatch"
+    ].forEach(function(n) {
+      rec["on" + n] = function() {
+        logEv(n);
+      };
     });
-    rec.onresult = function (ev) {
-      var res = ev.results[ev.results.length - 1], alts = [];
-      for (var i = 0; i < res.length; i++) alts.push(res[i].transcript.trim());
-      var conf = typeof res[0].confidence === "number" && res[0].confidence > 0 ? res[0].confidence : null;
-      if (!res.isFinal) { lastInterim = alts; lastConf = conf; logEv("parcial: " + alts[0]); return; }
+
+    rec.onresult = function(ev) {
+      var res = ev.results[ev.results.length - 1];
+      var alts = [];
+
+      for (var i = 0; i < res.length; i++) {
+        alts.push(res[i].transcript.trim());
+      }
+
+      var conf =
+        typeof res[0].confidence === "number" &&
+        res[0].confidence > 0
+          ? res[0].confidence
+          : null;
+
+      if (!res.isFinal) {
+        lastInterim = alts;
+        lastConf = conf;
+        logEv("parcial: " + alts[0]);
+        return;
+      }
+
       gotResult = true;
       logEv("final: " + alts.join(" | "));
-      showResult(evaluate(alts[0]), conf, alts, "reconocimiento de voz del navegador (" + lang + ")");
+      showResult(
+        evaluate(alts[0]),
+        conf,
+        alts,
+        "reconocimiento de voz del navegador (" + lang + ")"
+      );
     };
-    rec.onerror = function (ev) {
+
+    rec.onerror = function(ev) {
       logEv("error: " + ev.error);
       failed = true;
+
       var msg = "No pude escuchar. ¿Probamos otra vez?";
-      if (ev.error === "not-allowed" || ev.error === "service-not-allowed") msg = "Falta el permiso del micrófono. Habilitalo en el navegador y probá otra vez.";
-      else if (ev.error === "audio-capture") msg = "No encuentro un micrófono conectado.";
-      else if (ev.error === "network") msg = "El reconocimiento de voz necesita internet.";
-      $("bubble").innerHTML = '<span class="msg">' + msg + "</span>";
+
+      if (ev.error === "not-allowed" || ev.error === "service-not-allowed") {
+        msg = "Falta el permiso del micrófono. Habilitalo en el navegador.";
+      } else if (ev.error === "audio-capture") {
+        msg = "No encuentro un micrófono conectado.";
+      } else if (ev.error === "network") {
+        msg = "El reconocimiento de voz necesita internet.";
+      }
+
+      $("bubble").innerHTML = '<span class="msg">' + esc(msg) + "</span>";
     };
-    rec.onend = function () {
+
+    rec.onend = function() {
       clearTimeout(timer);
       setListening(false);
       logEv("fin");
-      if (!gotResult && !failed && lastInterim) {
+
+      if (!gotResult && !failed && lastInterim && lastInterim.length) {
         gotResult = true;
-        showResult(evaluate(lastInterim[0]), lastConf, lastInterim, "resultado parcial del reconocimiento (" + lang + ")");
+        showResult(
+          evaluate(lastInterim[0]),
+          lastConf,
+          lastInterim,
+          "resultado parcial del reconocimiento (" + lang + ")"
+        );
       } else if (!gotResult && !failed) {
-        var heardSound = evlog.some(function (l) { return l.indexOf("soundstart") > -1; });
-        showResult({ none: true, heard: "", target: show(g2p(TARGET_WORD)),
-          hint: heardSound ? "El micrófono detectó sonido, pero no entendió palabras." : "El micrófono no detectó sonido. Revisá el permiso y el volumen de entrada." }, null, [], "");
+        var heardSound = evlog.some(function(l) {
+          return l.indexOf("soundstart") > -1;
+        });
+
+        showResult({
+          none: true,
+          heard: "",
+          target: show(g2p(TARGET_WORD)),
+          hint: heardSound
+            ? "Se detectó sonido, pero no se entendió una palabra."
+            : "No se detectó sonido. Revisá el micrófono y el permiso."
+        }, null, [], "");
       }
     };
+
     try {
       rec.start();
       setListening(true);
       $("bubble").innerHTML = '<span class="msg">Te escucho…</span>';
-      timer = setTimeout(function () { try { rec.stop(); } catch (e) {} }, 7000);
-    } catch (e) { setListening(false); }
+
+      timer = setTimeout(function() {
+        try { rec.stop(); } catch(e) {}
+      }, 7000);
+    } catch(e) {
+      setListening(false);
+      $("bubble").innerHTML =
+        '<span class="msg">No pude iniciar el micrófono. Probá de nuevo.</span>';
+    }
   }
 
   function speak() {
-    if (!("speechSynthesis" in window)) return;
+    if (!("speechSynthesis" in window)) {
+      $("bubble").innerHTML =
+        '<span class="msg">Este navegador no puede reproducir la palabra.</span>';
+      return;
+    }
+
     try {
       speechSynthesis.cancel();
-      var u = new SpeechSynthesisUtterance("rana");
-      u.lang = "es-AR"; u.rate = 0.75;
+
+      var u = new SpeechSynthesisUtterance(TARGET_WORD);
+      u.lang = "es-AR";
+      u.rate = 0.75;
+
       speechSynthesis.speak(u);
-    } catch (e) {}
+    } catch(e) {}
   }
+
+  // ==========================================================
+  // EXPORTAR HISTORIAL
+  // ==========================================================
 
   function csv() {
-    var head = ["hora", "reconocido", "confianza", "diferencia", "estrellas", "origen"];
-    var lines = [head.join(",")].concat(state.hist.map(function (h) {
-      return [h.time, h.heard, h.conf == null ? "" : h.conf.toFixed(2), h.diff, h.stars, h.source || ""].map(function (v) {
-        return '"' + String(v).replace(/"/g, '""') + '"';
-      }).join(",");
-    }));
-    var blob = new Blob(["﻿" + lines.join("\n")], { type: "text/csv;charset=utf-8" });
+    var head = [
+      "hora",
+      "grupo",
+      "objetivo",
+      "reconocido",
+      "confianza",
+      "diferencia",
+      "estrellas",
+      "origen"
+    ];
+
+    var lines = [head.join(",")].concat(
+      state.hist.map(function(h) {
+        return [
+          h.time,
+          h.group || "",
+          h.target || "",
+          h.heard || "",
+          h.conf == null ? "" : h.conf.toFixed(2),
+          h.diff,
+          h.stars,
+          h.source || ""
+        ].map(function(v) {
+          return '"' + String(v).replace(/"/g, '""') + '"';
+        }).join(",");
+      })
+    );
+
+    var blob = new Blob(
+      ["\uFEFF" + lines.join("\n")],
+      { type: "text/csv;charset=utf-8" }
+    );
+
+    var url = URL.createObjectURL(blob);
     var a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "intentos-rana.csv";
-    document.body.appendChild(a); a.click(); a.remove();
+
+    a.href = url;
+    a.download = "intentos-pronunciacion.csv";
+
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    setTimeout(function() {
+      URL.revokeObjectURL(url);
+    }, 1000);
   }
 
+  // ==========================================================
+  // EVENTOS
+  // ==========================================================
+
   var clearArmed = false;
-  $("btnClear").addEventListener("click", function () {
+
+  $("btnClear").addEventListener("click", function() {
     if (!clearArmed) {
       clearArmed = true;
       this.textContent = "¿Seguro? Tocá de nuevo";
-      var b = this;
-      setTimeout(function () { clearArmed = false; b.textContent = "Borrar historial"; }, 4000);
+
+      var button = this;
+      setTimeout(function() {
+        clearArmed = false;
+        button.textContent = "Borrar historial";
+      }, 4000);
+
       return;
     }
+
     state = { xp: 0, stars: 0, streak: 0, hist: [] };
-    save(); renderStats(); renderHist();
-    clearArmed = false; this.textContent = "Borrar historial";
-    $("bubble").innerHTML = '<span class="msg">Tocá el botón verde y decí “rana”.</span>';
+    save();
+    renderStats();
+    renderHist();
+
+    clearArmed = false;
+    this.textContent = "Borrar historial";
+
+    $("bubble").innerHTML =
+      '<span class="msg">Elegí una palabra y decila en voz alta.</span>';
+
+    $("lastKv").innerHTML =
+      "<dt>Estado</dt><dd>Sin intentos todavía</dd>";
   });
 
   $("btnMic").addEventListener("click", startMic);
   $("btnListen").addEventListener("click", speak);
   $("btnCsv").addEventListener("click", csv);
-  $("btnManual").addEventListener("click", function () {
+
+  $("btnManual").addEventListener("click", function() {
     var v = $("manual").value;
     showResult(evaluate(v), null, [v], "texto escrito a mano");
   });
-  $("manual").addEventListener("keydown", function (e) { if (e.key === "Enter") $("btnManual").click(); });
+
+  $("manual").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") $("btnManual").click();
+  });
 
   if (!SR) {
     $("btnMic").disabled = true;
-    $("bubble").innerHTML = '<span class="msg">Este navegador no tiene reconocimiento de voz. Abrí la página en Chrome o probá el modo manual del panel técnico.</span>';
+    $("bubble").innerHTML =
+      '<span class="msg">Este navegador no tiene reconocimiento de voz. ' +
+      'Probá Chrome o usá el modo manual del panel técnico.</span>';
     $("pro").open = true;
   }
 
-  load(); renderStats(); renderHist();
+  // Inicio
+  load();
+  updateWordOptions();
+  renderStats();
+  renderHist();
 })();
 </script>
 </body>
